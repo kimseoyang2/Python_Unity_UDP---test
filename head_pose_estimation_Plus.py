@@ -37,8 +37,6 @@ peopleNum = 0
 isSent=False
 isStart=False
 
-STOPMESSAGE="STOP"
-
 
 
 # 유디피 통신 선언
@@ -146,9 +144,9 @@ def head_pose_points(img, rotation_vector, translation_vector, camera_matrix):
     rotation_vector : Array of float64
         Rotation Vector obtained from cv2.solvePnP
     translation_vector : Array of float64
-        Translation Vector obtained from cv2.solvePnPq
+        Translation Vector obtained from cv2.solvePnP
     camera_matrix : Array of float64
-        The camera matrixqq
+        The camera matrix
 
     Returns
     -------
@@ -192,7 +190,7 @@ def add():
     if(count and addTimer > 5):
         counter += 1
         count = False
-        print("Counter",counter)
+        print("Counter:",counter)
     timer = 0
 
 
@@ -234,16 +232,16 @@ def getTFminiData():
 
 
 
-
-
-                 # checkUnity()
-                # print(testCounter)
-                
                 global testCounter
                 testCounter += 1
                 if(testCounter > 500):
 
                     break
+
+
+                 # checkUnity()
+                # print(testCounter)
+
 
                 # print('(', distance, ',', strength, ')')
                 ser.reset_input_buffer()
@@ -280,13 +278,13 @@ ret, img = cap.read()
 size = img.shape
 font = cv2.FONT_HERSHEY_SIMPLEX
 
-state = 0
+state =0
 counter = 0
 count = True
 resetTimer = 0
 addTimer = 0
 limit = 2  # 기준 파라미터
- # 유니티 보낼 값
+result01 = "Over"  # 유니티 보낼 값
 peopleNum = 0
 timeCounter = 0
 
@@ -387,22 +385,17 @@ while True:
     
 
            
-    else:
-     #sock.SendData(STOPMESSAGE)
-        break
 
 
-           
-    cv2.imshow('img', img)
-        
-    if(state == 0):
+
+            if(state == 0):
                 # headpose 초기화
                 counter = 0
                 isStart=False
 
                 result = "null"
                 result01 = "null"
-                print("from Unity",data)
+                #print("from Unity",data)
 
 
 
@@ -410,11 +403,8 @@ while True:
 
 
 
-    elif(state == 1):
+            elif(state == 1):
 
-                # 라이다
-                
-                
                 if ang1 >= 40:
 
                     cv2.putText(img, 'Head down', (30, 30),
@@ -450,16 +440,18 @@ while True:
                 cv2.putText(img, str(ang2), tuple(x1),
                             font, 2, (255, 255, 128), 3)
                 # print('div by zero error')
-
+                
+                # 라이다
                 getTFminiData()
-                
-                
 
 
 
 
 
-    elif(state == 2 ):
+            elif(state == 2 ):
+
+
+
                 if ang1 >= 40:
 
                     cv2.putText(img, 'Head down', (30, 30),
@@ -495,7 +487,6 @@ while True:
                 cv2.putText(img, str(ang2), tuple(x1),
                             font, 2, (255, 255, 128), 3)
 
-
                 if(closeCounter < farCounter):
                     result01 = "FAR"
                 else:
@@ -510,7 +501,7 @@ while True:
                     print(result01)
                     isSent=True
 
-            
+                
 
                 #else:
                 
@@ -523,26 +514,22 @@ while True:
 
                 
 
-    elif(state == 3):
+            elif(state == 3):
                 
                 
                 
                 
                 decide()
-                counter = 0
-                closeCounter = 1
-                farCounter = 1
-                
                 if(isSent):
                     sock.SendData(result)
-                    print("HEAD POSE :",result)
+                    print(result)
                     isSent=False
 
-                state=0
 
                
                 #isSent=False
-
+                closeCounter = 1
+                farCounter = 1
                 #isSent=False
                 #saveToFile(dis)
                 
@@ -550,16 +537,11 @@ while True:
 
                 # sendtoUnity
 
-    elif(state == 4):
+            elif(state == 4):
                 
                 #sock.SendData(result)
                 saveCSV()
-               
-                counter = 0
-                closeCounter = 1
-                farCounter = 1
                 state=0
-
                 #isON=False
                 
                 
@@ -568,15 +550,11 @@ while True:
                 #)
                 
 
-
-
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+        cv2.imshow('img', img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
- 
-
-
-    
+    else:
+        break
 cv2.destroyAllWindows()
 cap.release()
 
